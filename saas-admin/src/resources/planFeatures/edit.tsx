@@ -1,9 +1,20 @@
-import { Edit, SimpleForm, TextInput, required } from 'react-admin';
+import {
+  Edit,
+  SimpleForm,
+  ReferenceInput,
+  SelectInput,
+  required
+} from 'react-admin';
 
 export const PlanFeatureEdit = () => (
   <Edit>
     <SimpleForm>
-      <TextInput source="name" validate={required()} />
+      <ReferenceInput source="planId" reference="plans" validate={required()}>
+        <SelectInput optionText="name" />
+      </ReferenceInput>
+      <ReferenceInput source="featureId" reference="features" validate={required()}>
+        <SelectInput optionText="name" />
+      </ReferenceInput>
     </SimpleForm>
   </Edit>
 );

@@ -1,10 +1,18 @@
-import { Show, SimpleShowLayout, TextField, DateField } from 'react-admin';
+import {
+  Show,
+  SimpleShowLayout,
+  TextField,
+  BooleanField,
+  DateField,
+  ReferenceField
+} from 'react-admin';
 
 export const SiteThemeShow = () => (
   <Show>
     <SimpleShowLayout>
       <TextField source="id" />
-      <TextField source="name" />
+      <ReferenceField source="themeId" reference="themes" />
+      <BooleanField source="isActive" />
       <DateField source="createdAt" />
       <DateField source="updatedAt" />
     </SimpleShowLayout>

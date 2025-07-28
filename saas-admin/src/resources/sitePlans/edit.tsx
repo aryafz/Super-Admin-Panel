@@ -1,9 +1,24 @@
-import { Edit, SimpleForm, TextInput, required } from 'react-admin';
+import {
+  Edit,
+  SimpleForm,
+  ReferenceInput,
+  SelectInput,
+  BooleanInput,
+  DateInput,
+  TextInput,
+  required
+} from 'react-admin';
 
 export const SitePlanEdit = () => (
   <Edit>
     <SimpleForm>
-      <TextInput source="name" validate={required()} />
+      <ReferenceInput source="planId" reference="plans" validate={required()}>
+        <SelectInput optionText="name" />
+      </ReferenceInput>
+      <BooleanInput source="isActive" />
+      <DateInput source="startsAt" />
+      <DateInput source="endsAt" />
+      <TextInput source="status" />
     </SimpleForm>
   </Edit>
 );

@@ -1,12 +1,23 @@
-import { List, Datagrid, TextField, DateField, TextInput, TopToolbar, CreateButton } from 'react-admin';
+import {
+  List,
+  Datagrid,
+  TextField,
+  BooleanField,
+  DateField,
+  TextInput,
+  TopToolbar,
+  CreateButton
+} from 'react-admin';
 
-const filters = [<TextInput source="name" label="Name" alwaysOn />];
+const filters = [<TextInput source="code" label="Code" alwaysOn />];
 
 export const FeatureList = () => (
   <List filters={filters} actions={<TopToolbar><CreateButton /></TopToolbar>}>
     <Datagrid rowClick="show">
       <TextField source="id" />
+      <TextField source="code" />
       <TextField source="name" />
+      <BooleanField source="isActive" />
       <DateField source="createdAt" />
     </Datagrid>
   </List>

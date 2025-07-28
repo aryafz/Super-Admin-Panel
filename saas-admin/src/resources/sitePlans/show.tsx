@@ -1,10 +1,21 @@
-import { Show, SimpleShowLayout, TextField, DateField } from 'react-admin';
+import {
+  Show,
+  SimpleShowLayout,
+  TextField,
+  BooleanField,
+  DateField,
+  ReferenceField
+} from 'react-admin';
 
 export const SitePlanShow = () => (
   <Show>
     <SimpleShowLayout>
       <TextField source="id" />
-      <TextField source="name" />
+      <ReferenceField source="planId" reference="plans" />
+      <BooleanField source="isActive" />
+      <DateField source="startsAt" />
+      <DateField source="endsAt" />
+      <TextField source="status" />
       <DateField source="createdAt" />
       <DateField source="updatedAt" />
     </SimpleShowLayout>
