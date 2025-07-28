@@ -1,30 +1,33 @@
-# SaaS Super Admin Panel
+# Uper Admin Panel
 
-This project provides a basic scaffold for a Super Admin Panel built with **React Admin**, **TypeScript**, and **Vite**. It authenticates via JWT against a NestJS backend and demonstrates multi‑tenant support using a tenant header.
+Production-ready multi-tenant admin panel built with **react-admin**, **Vite**, and **MUI**.
 
-## Setup
+## Prerequisites
 
-1. Install dependencies:
-   ```bash
-   npm ci
-   ```
-2. Copy `.env.example` to `.env` and set the API url and any custom token/tenant keys.
-3. Run the dev server:
-   ```bash
-   npm run dev
-   ```
+- Node.js and npm
 
-## Project Structure
+## Environment Variables
 
-- `src/auth` – authProvider and auth utilities.
-- `src/data` – axios http client and react-admin dataProvider.
-- `src/components` – shared UI components such as the `TenantSelector`.
-- `src/resources` – react-admin resources (example: Users).
+Copy `.env.example` to `.env` and fill in values:
+
+```
+VITE_API_URL=<backend-url>
+VITE_TOKEN_KEY=access_token
+VITE_AUTH_STORAGE_KEY=saas_admin_token
+VITE_TENANT_HEADER_NAME=x-tenant-id
+```
+
+## Installation & Run
+
+```bash
+npm ci
+npm run dev
+```
 
 ## Adding Resources
 
-Create a folder under `src/resources/<name>` with `list.tsx`, `create.tsx`, `edit.tsx`, and `show.tsx`. Export them via `index.ts` and register the resource inside `App.tsx`.
+Create a folder under `src/resources/<name>` with `list.tsx`, `create.tsx`, `edit.tsx`, and `show.tsx`, then export them via `index.ts` and register in `App.tsx`.
 
 ## Tenant Selector
 
-`TenantSelector` manages the currently selected site and sets the tenant header for site‑bound API calls using `httpClient`.
+`TenantSelector` in the top bar loads sites and sets the tenant header for site-bound resources automatically.

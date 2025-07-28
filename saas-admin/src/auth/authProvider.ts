@@ -1,46 +1,55 @@
-import type { AuthProvider } from 'react-admin'
-import axios from 'axios'
+import type { AuthProvider } from 'react-admin';
+import { api } from '../data/httpClient';
+import { clearToken, setToken, getToken } from '../utils/storage';
 
-const apiUrl = import.meta.env.VITE_API_URL
-const tokenKey = import.meta.env.VITE_TOKEN_KEY || 'access_token'
-const storageKey = import.meta.env.VITE_AUTH_STORAGE_KEY || 'saas_admin_token'
-
-const http = axios.create({ baseURL: apiUrl })
+const TOKEN_FIELD = import.meta.env.VITE_TOKEN_KEY || 'access_token';
 
 export const authProvider: AuthProvider = {
-    login: async ({ username, password }) => {
-        const { data } = await http.post('/auth/login', { email: username, password })
-        const token = data[tokenKey]
-        if (!token) throw new Error('Invalid login response')
-        localStorage.setItem(storageKey, token)
-        http.defaults.headers.common.Authorization = `Bearer ${token}`
-        await http.get('/auth/me')
-        return Promise.resolve()
-    },
-    logout: () => {
-        localStorage.removeItem(storageKey)
-        delete http.defaults.headers.common.Authorization
-        return Promise.resolve()
-    },
-    checkAuth: async () => {
-        const token = localStorage.getItem(storageKey)
-        if (token) {
-            http.defaults.headers.common.Authorization = `Bearer ${token}`
-            try {
-                await http.get('/auth/me')
-                return Promise.resolve()
-            } catch {
-                return Promise.reject()
-            }
-        }
-        return Promise.reject()
-    },
-    getIdentity: async () => {
-        const { data } = await http.get('/auth/me')
-        return data
-    },
-    checkError: () => Promise.resolve(),
-    getPermissions: () => Promise.resolve(),
-}
+  login: async ({ username, password }) => {
+    const res = await api.post('/auth/login', { email: username, password });
+    const token = res.data?.[TOKEN_FIELD];
+    if (!token) throw new Error('Invalid login response: token missing');
+    setToken(token);
+    await api.get('/auth/me');
+  },
 
-export default authProvider
+  logout: async () => {
+    clearToken();
+    return Promise.resolve();
+  },
+
+  checkAuth: async () => {
+    const token = getToken();
+    if (!token) return Promise.reject();
+    try {
+      await api.get('/auth/me');
+      return Promise.resolve();
+    } catch {
+      clearToken();
+      return Promise.reject();
+    }
+  },
+
+  checkError: async (error) => {
+    const status = error?.status || error?.response?.status;
+    if (status === 401) {
+      clearToken();
+      return Promise.reject();
+    }
+    return Promise.resolve();
+  },
+
+  getPermissions: async () => {
+    try {
+      const { data } = await api.get('/auth/me');
+      return data?.role || 'user';
+    } catch {
+      return 'user';
+    }
+  },
+
+  getIdentity: async () => {
+    const { data } = await api.get('/auth/me');
+    return { id: data?.id, fullName: data?.email, ...data };
+  }
+};

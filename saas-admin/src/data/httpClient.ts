@@ -1,25 +1,36 @@
-import axios from 'axios'
+import axios from 'axios';
+import { getToken } from '../utils/storage';
 
-const apiUrl = import.meta.env.VITE_API_URL
-const tenantHeaderName = import.meta.env.VITE_TENANT_HEADER_NAME || 'x-tenant-id'
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+  timeout: 20000
+});
 
-let selectedSite: string | null = null
+const TENANT_HEADER = import.meta.env.VITE_TENANT_HEADER_NAME || 'x-tenant-id';
 
-export const setTenant = (siteId: string | null) => {
-    selectedSite = siteId
-}
+export const setAuthHeader = (config: any) => {
+  const token = getToken();
+  if (token) {
+    config.headers = config.headers || {};
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+};
 
-export const httpClient = axios.create({ baseURL: apiUrl })
+api.interceptors.request.use((config) => {
+  return setAuthHeader(config);
+});
 
-httpClient.interceptors.request.use(config => {
-    const token = localStorage.getItem(import.meta.env.VITE_AUTH_STORAGE_KEY)
-    if (token) {
-        config.headers = config.headers || {}
-        config.headers['Authorization'] = `Bearer ${token}`
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    if (err.response) {
+      const { status, data } = err.response;
+      const message = data?.message || 'Request failed';
+      return Promise.reject({ status, message, data });
     }
-    if (selectedSite) {
-        config.headers = config.headers || {}
-        config.headers[tenantHeaderName] = selectedSite
-    }
-    return config
-})
+    return Promise.reject({ status: 0, message: 'Network error' });
+  }
+);
+
+export { api, TENANT_HEADER };
