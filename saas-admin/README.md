@@ -17,7 +17,7 @@ VITE_AUTH_STORAGE_KEY=saas_admin_token
 VITE_TENANT_HEADER_NAME=x-tenant-id
 ```
 
-## Installation & Run
+## Setup
 
 ```bash
 npm ci
@@ -26,8 +26,8 @@ npm run dev
 
 ## Adding Resources
 
-Create a folder under `src/resources/<name>` with `list.tsx`, `create.tsx`, `edit.tsx`, and `show.tsx`, then export them via `index.ts` and register in `App.tsx`.
+Create a folder under `src/resources/<name>` with `list.tsx`, `create.tsx`, `edit.tsx`, and `show.tsx` files. Export them via an `index.ts` file and register the resource in `App.tsx`.
 
 ## Tenant Selector
 
-`TenantSelector` in the top bar loads sites and sets the tenant header for site-bound resources automatically.
+`TenantSelector` in the top bar fetches the available sites and stores the selected site via `setTenantSite`. The data provider then attaches the tenant header for resources that are site-bound.
