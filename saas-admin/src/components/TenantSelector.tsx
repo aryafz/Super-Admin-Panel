@@ -1,29 +1,33 @@
-import { useState, useEffect } from 'react'
-import { setTenant, httpClient } from '../data/httpClient'
+import { useEffect, useState } from 'react';
+import { api } from '../data/httpClient';
+import { setTenantSite } from '../data/dataProvider';
+import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 
-interface Site { id: string; name: string }
+export const TenantSelector = () => {
+  const [sites, setSites] = useState<any[]>([]);
+  const [siteId, setSiteId] = useState<string | ''>('');
 
-export default function TenantSelector() {
-    const [sites, setSites] = useState<Site[]>([])
-    const [current, setCurrent] = useState<string | null>(null)
+  useEffect(() => {
+    api.get('/sites', { params: { page: 1, limit: 100 } })
+       .then((res) => setSites(res.data?.data || res.data || []))
+       .catch(() => setSites([]));
+  }, []);
 
-    useEffect(() => {
-        // fetch sites for selection
-        httpClient.get('/sites').then(res => setSites(res.data?.items ?? res.data)).catch(() => {})
-    }, [])
+  const handleChange = (e: any) => {
+    const v = e.target.value as string;
+    setSiteId(v);
+    setTenantSite(v || null);
+  };
 
-    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const siteId = e.target.value || null
-        setCurrent(siteId)
-        setTenant(siteId)
-    }
-
-    return (
-        <select value={current ?? ''} onChange={handleChange}>
-            <option value="">Select Site</option>
-            {sites.map(s => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-            ))}
-        </select>
-    )
-}
+  return (
+    <FormControl size="small" sx={{ minWidth: 240 }}>
+      <InputLabel id="tenant-select-label">سایت (Tenant)</InputLabel>
+      <Select labelId="tenant-select-label" value={siteId} label="سایت (Tenant)" onChange={handleChange}>
+        <MenuItem value=""><em>بدون انتخاب</em></MenuItem>
+        {sites.map((s) => (
+          <MenuItem key={s.id} value={s.id}>{s.name} ({s.slug})</MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  );
+};
